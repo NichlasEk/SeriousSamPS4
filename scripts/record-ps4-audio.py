@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run a PS4 test with a private PulseAudio sink and save only its audio."""
 from array import array
+import argparse
 import json
 import math
 import os
@@ -11,7 +12,11 @@ import time
 import wave
 
 root = Path(__file__).resolve().parents[1]
-out = root/'artifacts/ps4'
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--game', choices=['tfe', 'tse'], default='tfe')
+parser.add_argument('--output', type=Path)
+args, _ = parser.parse_known_args()
+out = args.output or root/('artifacts/ps4' if args.game == 'tfe' else 'artifacts/ps4-tse')
 out.mkdir(parents=True, exist_ok=True)
 sink = f'serioussam_test_{os.getpid()}'
 module = subprocess.check_output(['pactl', 'load-module', 'module-null-sink',

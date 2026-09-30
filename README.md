@@ -10,26 +10,44 @@ For MODE2/2352 BIN/CUE images named `Serious Sam - The First Encounter (USA)` an
 
 The original game archives are in `media/game/tfe/Install/*.gro` and `media/game/tse/Install/*.gro`. The port will stage the needed archives for each game separately. All disc images, converted ISOs, and extracted files stay local.
 
-The **First Encounter PS4 alpha** builds with OpenOrbis and runs in shadPS4 using the source-built native Vulkan/OpenGNM stack from the Doom 3 port. Hatshepsut loads with first-person HUD, movement and aiming verified through emulated ScePad. Ogg/MP3 decoding and PS4 AudioOut produce a captured audio signal. Physical PS4 testing remains outstanding. Second Encounter currently has only the desktop baseline.
+**First Encounter 0.02 is confirmed running on a physical PS4:** the user reports smooth gameplay and slower cinematics. The next First Encounter build adds touchpad quicksave and hold-L3 walking. **Second Encounter now cross-builds and runs through the same PS4 Vulkan stack in shadPS4**, with a separate title, profile and local package. Its physical PS4 test is pending.
 
 ## Build and run the initial PS4 client
 
 With the local OpenOrbis SDK and the Doom 3 native graphics archives available:
 
 ```sh
-bash scripts/build-ps4.sh
-python3 scripts/run-ps4.py --seconds 180
+bash scripts/build-ps4.sh tfe
+python3 scripts/run-ps4.py --game tfe --seconds 180
+bash scripts/build-ps4.sh tse
+python3 scripts/run-ps4.py --game tse --seconds 180
 ```
 
-The build produces `build/runtime-tfe/eboot.bin`. The runner uses an isolated shadPS4 profile, captures `artifacts/ps4/emulator.png`, records logs and stops after the requested duration.
+The builds produce `build/runtime-tfe/eboot.bin` and `build/runtime-tse/eboot.bin`. The runner uses separate shadPS4 profiles and atomically allocated Xvfb displays, captures `artifacts/ps4/emulator.png` or `artifacts/ps4-tse/emulator.png`, records logs and stops after the requested duration.
 
 To create and check a local installable package containing your supplied game data:
 
 ```sh
-python3 scripts/package-ps4.py
-python3 scripts/verify-ps4-package.py
+python3 scripts/package-ps4.py --game tfe
+python3 scripts/verify-ps4-package.py --game tfe
+python3 scripts/package-ps4.py --game tse
+python3 scripts/verify-ps4-package.py --game tse
 ```
 
-Output: `dist/SeriousSam-TFE-PS4-Alpha-0.01-local.pkg` (title ID `SSAM00001`). This package contains retail assets and stays local; it is ignored by Git.
+Local outputs (both contain retail assets and remain ignored by Git):
+
+| Game | Package | Title ID | Saves/logs |
+| --- | --- | --- | --- |
+| First Encounter | `dist/SeriousSam-TFE-PS4-Alpha-0.03-local.pkg` | `SSAM00001` | `/data/serioussam` |
+| Second Encounter | `dist/SeriousSam-TSE-PS4-Alpha-0.01-local.pkg` | `SSAM00002` | `/data/serioussamse` |
+
+Both include the full supplied campaign data, not just the opening level. The two titles can coexist. This is still an alpha: including every campaign file does not establish a complete playthrough.
 
 See [port status](docs/PORT_STATUS.md) for dependencies, current evidence and remaining work.
+
+## Cover icons
+
+Separate generated artwork is included for each encounter. Package-ready icons:
+[TFE](assets/icon0-tfe.png) · [TSE](assets/icon0-tse.png). Originals are under
+`assets/artwork/`; the [exact prompts](assets/icon-prompts.json) record the
+built-in image generation workflow.

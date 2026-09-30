@@ -1,0 +1,172 @@
+[
+  {
+    "at": 25,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 25.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 29,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 29.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 33,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 33.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 37,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 37.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 55,
+    "type": "keydown",
+    "key": "Return"
+  },
+  {
+    "at": 55.4,
+    "type": "keyup",
+    "key": "Return"
+  },
+  {
+    "at": 59,
+    "type": "capture",
+    "name": "weapon-before.png"
+  },
+  {
+    "at": 60,
+    "type": "keydown",
+    "key": "u"
+  },
+  {
+    "at": 60.4,
+    "type": "keyup",
+    "key": "u"
+  },
+  {
+    "at": 63,
+    "type": "keydown",
+    "key": "u"
+  },
+  {
+    "at": 63.4,
+    "type": "keyup",
+    "key": "u"
+  },
+  {
+    "at": 66,
+    "type": "keydown",
+    "key": "u"
+  },
+  {
+    "at": 66.4,
+    "type": "keyup",
+    "key": "u"
+  },
+  {
+    "at": 69,
+    "type": "keydown",
+    "key": "u"
+  },
+  {
+    "at": 69.4,
+    "type": "keyup",
+    "key": "u"
+  },
+  {
+    "at": 72,
+    "type": "capture",
+    "name": "weapon-cycled.png"
+  },
+  {
+    "at": 73,
+    "type": "keydown",
+    "key": "e"
+  },
+  {
+    "at": 73.4,
+    "type": "keyup",
+    "key": "e"
+  },
+  {
+    "at": 75,
+    "type": "capture",
+    "name": "scope.png"
+  },
+  {
+    "at": 76,
+    "type": "keydown",
+    "key": "Up"
+  },
+  {
+    "at": 76.4,
+    "type": "keyup",
+    "key": "Up"
+  },
+  {
+    "at": 78,
+    "type": "capture",
+    "name": "scope-zoom.png"
+  },
+  {
+    "at": 79,
+    "type": "keydown",
+    "key": "Down"
+  },
+  {
+    "at": 79.4,
+    "type": "keyup",
+    "key": "Down"
+  },
+  {
+    "at": 82,
+    "type": "capture",
+    "name": "scope-out.png"
+  },
+  {
+    "at": 83,
+    "type": "keydown",
+    "key": "e"
+  },
+  {
+    "at": 83.4,
+    "type": "keyup",
+    "key": "e"
+  },
+  {
+    "at": 86,
+    "type": "keydown",
+    "key": "m"
+  },
+  {
+    "at": 86.4,
+    "type": "keyup",
+    "key": "m"
+  },
+  {
+    "at": 89,
+    "type": "capture",
+    "name": "bomb.png"
+  }
+]

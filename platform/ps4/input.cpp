@@ -47,6 +47,15 @@ void ss_ps4_poll_pad()
         next[game ? SDL_SCANCODE_A : SDL_SCANCODE_LEFT] |= pad.leftStick.x < 96;
         next[game ? SDL_SCANCODE_D : SDL_SCANCODE_RIGHT] |= pad.leftStick.x > 160;
         if (game) {
+            next[SDL_SCANCODE_F6] = pad.buttons & ORBIS_PAD_BUTTON_TOUCH_PAD;
+            next[SDL_SCANCODE_LSHIFT] = pad.buttons & ORBIS_PAD_BUTTON_L3;
+#ifdef SS_PS4_TSE
+            // TSE's extra weapons need scope adjustment and the Serious Bomb.
+            next[SDL_SCANCODE_UP] = next[SDL_SCANCODE_DOWN] = false;
+            next[SDL_SCANCODE_X] = pad.buttons & ORBIS_PAD_BUTTON_UP;
+            next[SDL_SCANCODE_Z] = pad.buttons & ORBIS_PAD_BUTTON_DOWN;
+            next[SDL_SCANCODE_0] = pad.buttons & ORBIS_PAD_BUTTON_R3;
+#endif
             next[SDL_SCANCODE_LCTRL] = (pad.buttons & ORBIS_PAD_BUTTON_R2) || pad.analogButtons.r2 >= 32;
             next[SDL_SCANCODE_RETURN] = (pad.buttons & ORBIS_PAD_BUTTON_L2) || pad.analogButtons.l2 >= 32;
             next[SDL_SCANCODE_LALT] = pad.buttons & ORBIS_PAD_BUTTON_SQUARE;

@@ -1,0 +1,67 @@
+[
+  {
+    "at": 25,
+    "type": "keydown",
+    "key": "Return"
+  },
+  {
+    "at": 25.3,
+    "type": "keyup",
+    "key": "Return"
+  },
+  {
+    "at": 29,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 29.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 33,
+    "type": "keydown",
+    "key": "Down"
+  },
+  {
+    "at": 33.3,
+    "type": "keyup",
+    "key": "Down"
+  },
+  {
+    "at": 35,
+    "type": "keydown",
+    "key": "Down"
+  },
+  {
+    "at": 35.3,
+    "type": "keyup",
+    "key": "Down"
+  },
+  {
+    "at": 37,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 37.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 42,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 42.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 62,
+    "type": "capture",
+    "name": "cold-reload.png"
+  }
+]

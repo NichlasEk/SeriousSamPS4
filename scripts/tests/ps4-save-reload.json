@@ -1,0 +1,197 @@
+[
+  {
+    "at": 25,
+    "type": "keydown",
+    "key": "Return"
+  },
+  {
+    "at": 25.3,
+    "type": "keyup",
+    "key": "Return"
+  },
+  {
+    "at": 29,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 29.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 33,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 33.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 37,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 37.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 65,
+    "type": "keydown",
+    "key": "o"
+  },
+  {
+    "at": 65.3,
+    "type": "keyup",
+    "key": "o"
+  },
+  {
+    "at": 70,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 70.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 80,
+    "type": "keydown",
+    "key": "o"
+  },
+  {
+    "at": 81,
+    "type": "keyup",
+    "key": "o"
+  },
+  {
+    "at": 88,
+    "type": "keydown",
+    "key": "o"
+  },
+  {
+    "at": 89,
+    "type": "keyup",
+    "key": "o"
+  },
+  {
+    "at": 90,
+    "type": "capture",
+    "name": "pre-input.png"
+  },
+  {
+    "at": 94,
+    "type": "keydown",
+    "key": "Return"
+  },
+  {
+    "at": 95,
+    "type": "keyup",
+    "key": "Return"
+  },
+  {
+    "at": 100,
+    "type": "capture",
+    "name": "game-before.png"
+  },
+  {
+    "at": 102,
+    "type": "keydown",
+    "key": "w"
+  },
+  {
+    "at": 105,
+    "type": "keyup",
+    "key": "w"
+  },
+  {
+    "at": 106,
+    "type": "capture",
+    "name": "game-moved.png"
+  },
+  {
+    "at": 107,
+    "type": "keydown",
+    "key": "space"
+  },
+  {
+    "at": 107.3,
+    "type": "keyup",
+    "key": "space"
+  },
+  {
+    "at": 108,
+    "type": "keydown",
+    "key": "l"
+  },
+  {
+    "at": 108.7,
+    "type": "keyup",
+    "key": "l"
+  },
+  {
+    "at": 111,
+    "type": "capture",
+    "name": "game-turned.png"
+  },
+  {
+    "at": 113,
+    "type": "keydown",
+    "key": "o"
+  },
+  {
+    "at": 116,
+    "type": "keyup",
+    "key": "o"
+  },
+  {
+    "at": 118,
+    "type": "capture",
+    "name": "game-fired.png"
+  },
+  {
+    "at": 121,
+    "type": "keydown",
+    "key": "Return"
+  },
+  {
+    "at": 122,
+    "type": "keyup",
+    "key": "Return"
+  },
+  {
+    "at": 126,
+    "type": "capture",
+    "name": "game-paused.png"
+  },
+  {
+    "at": 128,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 128.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 135,
+    "type": "keydown",
+    "key": "n"
+  },
+  {
+    "at": 135.3,
+    "type": "keyup",
+    "key": "n"
+  },
+  {
+    "at": 150,
+    "type": "capture",
+    "name": "game-reloaded.png"
+  }
+]
