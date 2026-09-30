@@ -10,6 +10,17 @@ For MODE2/2352 BIN/CUE images named `Serious Sam - The First Encounter (USA)` an
 
 The original game archives are in `media/game/tfe/Install/*.gro` and `media/game/tse/Install/*.gro`. The port will stage the needed archives for each game separately. All disc images, converted ISOs, and extracted files stay local.
 
-The PS4 port has not been built or tested yet. The existing Doom 3 PS4 project is a reference for the OpenOrbis graphics and packaging work.
+The first **First Encounter PS4 client** builds with OpenOrbis and boots in shadPS4 using the source-built native Vulkan/OpenGNM stack from the Doom 3 port. Startup logos and the textured 3D intro are visibly rendered from the retail data. Controller play, audio and a physical PS4 are not yet verified. Second Encounter currently has only the desktop baseline.
 
-See [port status](docs/PORT_STATUS.md) for the current data and desktop baseline.
+## Build and run the initial PS4 client
+
+With the local OpenOrbis SDK and the Doom 3 native graphics archives available:
+
+```sh
+bash scripts/build-ps4.sh
+python3 scripts/run-ps4.py --seconds 180
+```
+
+The build produces `build/runtime-tfe/eboot.bin`. The runner uses an isolated shadPS4 profile, captures `artifacts/ps4/emulator.png`, records logs and stops after the requested duration. It does not create an installable PKG.
+
+See [port status](docs/PORT_STATUS.md) for dependencies, current evidence and remaining work.
