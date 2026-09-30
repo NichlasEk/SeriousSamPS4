@@ -10,7 +10,7 @@ parser.add_argument("output", type=Path)
 parser.add_argument("archives", nargs="+")
 args = parser.parse_args()
 raw = subprocess.check_output(["llvm-nm", "--defined-only", "--extern-only", "--just-symbol-name", *args.archives], text=True)
-names = sorted({n for n in raw.split() if re.fullmatch(r"(?:[A-Za-z0-9_]+_DLLClass|Shader_[A-Za-z0-9_]+|GAME_Create)", n)})
+names = sorted({n for n in raw.split() if re.fullmatch(r"(?:[A-Za-z0-9_]+_DLLClass|Shader_[A-Za-z0-9_]+|GAME_Create|ov_[A-Za-z0-9_]+|al[A-Z][A-Za-z0-9_]+)", n)})
 if "GAME_Create" not in names or not any(n.endswith("_DLLClass") for n in names):
     raise SystemExit("Missing game/entity exports")
 lines = ['#include <string.h>']

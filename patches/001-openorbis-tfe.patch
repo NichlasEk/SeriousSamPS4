@@ -1,5 +1,5 @@
 diff --git a/SamTFE/Sources/CMakeLists.txt b/SamTFE/Sources/CMakeLists.txt
-index 6c52663..2c0ed16 100644
+index 6c52663..8c47017 100644
 --- a/SamTFE/Sources/CMakeLists.txt
 +++ b/SamTFE/Sources/CMakeLists.txt
 @@ -397,9 +397,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_
@@ -93,6 +93,15 @@ index 6c52663..2c0ed16 100644
       ${ENGINE_SRCS}
  )
  if(MACOSX)
+@@ -1605,7 +1603,7 @@ set(AMP11LIB_SOURCE_FILES
+     amp11lib/ampdec.h
+     amp11lib/ampsynth.cpp)
+ 
+-add_library(amp11lib${MP} SHARED ${AMP11LIB_SOURCE_FILES})
++add_library(amp11lib${MP} STATIC ${AMP11LIB_SOURCE_FILES})
+ endif()
+ 
+ if(MACOSX)
 @@ -1844,3 +1842,7 @@ if(NOT LOCAL_INSTALL AND NOT XPLUS)
  endif()
  
@@ -102,9 +111,20 @@ index 6c52663..2c0ed16 100644
 +  include("${SS_PS4_ROOT}/cmake/ps4-targets.cmake")
 +endif()
 diff --git a/SamTFE/Sources/Engine/Base/SDL/SDLInput.cpp b/SamTFE/Sources/Engine/Base/SDL/SDLInput.cpp
-index d8bba52..5e08151 100644
+index d8bba52..70e8ae8 100644
 --- a/SamTFE/Sources/Engine/Base/SDL/SDLInput.cpp
 +++ b/SamTFE/Sources/Engine/Base/SDL/SDLInput.cpp
+@@ -104,8 +104,8 @@ static const KeyConversion _akcKeys[] = {
+   { KID_I               , SDLK_i, INTNAME("I")},
+   { KID_O               , SDLK_o, INTNAME("O")},
+   { KID_P               , SDLK_p, INTNAME("P")},
+-  { KID_LBRACKET        , SDLK_RIGHTPAREN, INTNAME("[")},
+-  { KID_RBRACKET        , SDLK_RIGHTPAREN, INTNAME("]")},
++  { KID_LBRACKET        , SDLK_LEFTBRACKET, INTNAME("[")},
++  { KID_RBRACKET        , SDLK_RIGHTBRACKET, INTNAME("]")},
+   { KID_BACKSLASH       , SDLK_BACKSLASH,  INTNAME("\\")},
+ 
+ // 2nd alpha row            
 @@ -274,13 +274,13 @@ static void SetKeyFromEvent(const SDL_Event *event, const BOOL bDown)
      if (inp_bSDLGrabInput)
      {
@@ -121,7 +141,29 @@ index d8bba52..5e08151 100644
        inp_bSDLGrabInput = TRUE;
      } // else
  
-@@ -641,7 +641,7 @@ void CInput::EnableInput(HWND hwnd)
+@@ -304,6 +304,7 @@ static void SetKeyFromEvent(const SDL_Event *event, const BOOL bDown)
+   if (iKID>=0 && iKID<static_cast<INDEX>(ARRAYCOUNT(_abKeysPressed))) {
+     //CPrintF("%s: %d\n", _pInput->inp_strButtonNames[iKID], bDown);
+     _abKeysPressed[iKID] = bDown;
++    fprintf(stderr, "PS4 INPUT kid=%d down=%d enabled=%d\n", int(iKID), int(bDown), int(_pInput->IsInputEnabled()));
+   }
+ }
+ 
+@@ -352,11 +353,13 @@ static void sdl_event_handler(const SDL_Event *event)
+ //  making sure all SDL events tunnel through one function.
+ //   DO NOT DIRECTLY MESS WITH THE SDL EVENT QUEUE THROUGH ANY OTHER FUNCTION.
+ //   Parameters/retval are same as SDL_PollEvent().
++extern void ss_ps4_poll_pad();
+ int SE_SDL_InputEventPoll(SDL_Event *sdlevent)
+ {
+     ASSERT(sdlevent != NULL);
+     CTSingleLock slInput(&sl_csInput, FALSE);
+     if(slInput.TryToLock()) {
++      ss_ps4_poll_pad();
+       const int retval = SDL_PollEvent(sdlevent);
+       if (retval)
+           sdl_event_handler(sdlevent);
+@@ -641,7 +644,7 @@ void CInput::EnableInput(HWND hwnd)
    inp_ptOldMousePos.x = mousex;
    inp_ptOldMousePos.y = mousey;
  
@@ -130,7 +172,7 @@ index d8bba52..5e08151 100644
  
    // save system mouse settings
    memset(&inp_mscMouseSettings, '\0', sizeof (MouseSpeedControl));
-@@ -673,7 +673,7 @@ void CInput::DisableInput( void)
+@@ -673,7 +676,7 @@ void CInput::DisableInput( void)
    SDL_JoystickEventState(SDL_DISABLE);
  
    // show mouse on screen
@@ -139,6 +181,15 @@ index d8bba52..5e08151 100644
  
    // eventually disable 2nd mouse
  #if 0
+@@ -685,7 +688,7 @@ void CInput::DisableInput( void)
+   inp_bPollJoysticks = FALSE;
+ }
+ 
+-#define USE_MOUSEWARP 1
++// PS4 stick motion arrives as SDL events; there is no desktop mouse to poll.
+ // Define this to use GetMouse instead of using Message to read mouse coordinates
+ 
+ // blank any queued mousemove events...SDLInput.cpp needs this when
 diff --git a/SamTFE/Sources/Engine/Base/Timer.cpp b/SamTFE/Sources/Engine/Base/Timer.cpp
 index e074e18..9b8c465 100644
 --- a/SamTFE/Sources/Engine/Base/Timer.cpp
@@ -676,6 +727,25 @@ index 79b4319..b6a737a 100644
  FLOAT _fStartTime;
  CCameraPos _cp0;
  CCameraPos _cp1;
+diff --git a/SamTFE/Sources/GameMP/Game.cpp b/SamTFE/Sources/GameMP/Game.cpp
+index 025a6e9..cf8a1a7 100644
+--- a/SamTFE/Sources/GameMP/Game.cpp
++++ b/SamTFE/Sources/GameMP/Game.cpp
+@@ -1134,6 +1134,14 @@ void CGame::GameHandleTimer(void)
+           INDEX iCurrentPlayer = gm_lpLocalPlayers[ iPlayer].lp_iPlayer;
+           CControls &ctrls = gm_actrlControls[ iCurrentPlayer];
+           ctrls.CreateAction(gm_apcPlayers[iCurrentPlayer], paAction, FALSE);
++          static ULONG lastButtons = 0;
++          static FLOAT lastForward = 0;
++          if (paAction.pa_ulButtons != lastButtons || paAction.pa_vTranslation(3) != lastForward) {
++            fprintf(stderr, "PS4 ACTION buttons=%x forward=%g\n", unsigned(paAction.pa_ulButtons), double(paAction.pa_vTranslation(3)));
++            lastButtons = paAction.pa_ulButtons;
++            lastForward = paAction.pa_vTranslation(3);
++          }
++
+           // set the action in the client source object
+           gm_lpLocalPlayers[ iPlayer].lp_pplsPlayerSource->SetAction(paAction);
+ 
 diff --git a/SamTFE/Sources/SeriousSam/MainWindow.cpp b/SamTFE/Sources/SeriousSam/MainWindow.cpp
 index 6797075..95bfd44 100644
 --- a/SamTFE/Sources/SeriousSam/MainWindow.cpp
@@ -749,7 +819,7 @@ index 8d8c1e6..8f6fc25 100644
        strHighScores[i+1][1] = "---";
        continue;
 diff --git a/SamTFE/Sources/SeriousSam/SeriousSam.cpp b/SamTFE/Sources/SeriousSam/SeriousSam.cpp
-index 9437bc4..e5075a6 100644
+index 9437bc4..7554cf8 100644
 --- a/SamTFE/Sources/SeriousSam/SeriousSam.cpp
 +++ b/SamTFE/Sources/SeriousSam/SeriousSam.cpp
 @@ -64,10 +64,10 @@ extern FLOAT _fGlobalModAdjuster;
@@ -771,11 +841,26 @@ index 9437bc4..e5075a6 100644
    }
  
    // initialize sound library
-+  snd_iFormat = 0; // Initial PS4 client runs without audio.
++  snd_iFormat = CSoundLibrary::SF_44100_16; // SDL resamples for PS4 AudioOut.
    snd_iFormat = Clamp( snd_iFormat, (INDEX)CSoundLibrary::SF_NONE, (INDEX)CSoundLibrary::SF_44100_16);
    _pSound->SetFormat( (enum CSoundLibrary::SoundFormat)snd_iFormat);
  
-@@ -1774,8 +1775,18 @@ static inline void warn_profiling(void)
+@@ -987,6 +988,14 @@ void PrintDisplayModeInfo(void)
+   pdp->PutText( strRes, slDPWidth*0.05f, slDPHeight*0.85f, _pGame->LCDGetColor(C_GREEN|255, "display mode"));
+ }
+ 
++bool ss_ps4_gameplay_input()
++{
++  return _pGame && _pGame->gm_bGameOn && !bMenuActive &&
++    _gmRunningGameMode == GM_SINGLE_PLAYER &&
++    _pGame->gm_csConsoleState == CS_OFF &&
++    (_pGame->gm_csComputerState == CS_OFF || _pGame->gm_csComputerState == CS_ONINBACKGROUND);
++}
++
+ // do the main game loop and render screen
+ void DoGame(void)
+ {
+@@ -1774,8 +1783,18 @@ static inline void warn_profiling(void)
  
  
  
@@ -794,7 +879,7 @@ index 9437bc4..e5075a6 100644
    #ifdef BETAEXPIRE
      // !!! FIXME: This is Unix-centric (at least, non-win32) if put in main().
      check_beta();
-@@ -1951,6 +1962,12 @@ const INDEX ctDefaultModes = ARRAYCOUNT(aDefaultModes);
+@@ -1951,6 +1970,12 @@ const INDEX ctDefaultModes = ARRAYCOUNT(aDefaultModes);
  // start new display mode
  void StartNewMode( enum GfxAPIType eGfxAPI, INDEX iAdapter, PIX pixSizeI, PIX pixSizeJ, PIX aspSizeI, PIX aspSizeJ, enum DisplayDepth eColorDepth, BOOL bFullScreenMode, BOOL bBorderLessMode)
  {

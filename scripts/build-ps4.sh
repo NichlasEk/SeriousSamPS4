@@ -13,6 +13,8 @@ mkdir -p "$root/build" "$root/artifacts/ps4" "$root/build/runtime-tfe"
 }
 [[ -x "$converter" ]] || { echo 'Set CREATE_FSELF to the OpenOrbis converter.' >&2; exit 1; }
 sha256sum "$root/patches/001-openorbis-tfe.patch" \
+  "$root/platform/ps4/"*.cpp "$root/platform/ps4/"*.c \
+  "$root/cmake/"*.cmake "$root/scripts/build-ps4-sdl.py" \
   "$stack/vulkan-ps4/libvulkan_ps4.a" "$stack/opengnm/libopengnm.a" \
   "$stack/libpsbc-private.a" "$OO_PS4_TOOLCHAIN/lib/libSDL2.a" "$converter" \
   > "$root/artifacts/ps4/build-inputs.sha256"

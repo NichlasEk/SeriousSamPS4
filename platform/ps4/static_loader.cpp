@@ -10,7 +10,8 @@ class CStaticLoader : public CDynamicLoader {
 public:
     explicit CStaticLoader(const char *name) : error(nullptr) {
         if (name && !strstr(name, "Entities") && !strstr(name, "Game") &&
-            !strstr(name, "Shaders")) error = "Module is not linked into the PS4 client";
+            !strstr(name, "Shaders") && !strstr(name, "vorbisfile") &&
+            !strstr(name, "amp11lib")) error = "Module is not linked into the PS4 client";
     }
     void *FindSymbol(const char *name) override {
         if (error) return nullptr;

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#171719"/>
+  <path d="M0 388L180 180L350 388Z" fill="#a37a39"/>
+  <path d="M180 180L350 388H240Z" fill="#674821"/>
+  <rect y="388" width="512" height="124" fill="#bb2926"/>
+  <g fill="white" font-family="DejaVu Sans" font-weight="bold" text-anchor="middle">
+    <text x="256" y="98" font-size="56">SERIOUS SAM</text>
+    <text x="256" y="148" font-size="24">THE FIRST ENCOUNTER</text>
+    <text x="256" y="456" font-size="42">PS4 · ALPHA</text>
+  </g>
+</svg>

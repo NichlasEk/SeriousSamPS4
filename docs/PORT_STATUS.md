@@ -1,6 +1,6 @@
 # Serious Sam PS4 port status
 
-Updated 2026-09-30. Initial First Encounter OpenOrbis client built and booted in shadPS4; this is an early graphics bring-up, not a finished console port.
+Updated 2026-09-30. First Encounter alpha now includes native controller input, statically linked audio codecs, and a local console package. Physical-console validation remains outstanding.
 
 ## Source and game data
 
@@ -24,7 +24,9 @@ The First Encounter log reports a Vulkan context on the host RTX 4090 and a star
 - Packs four texture bindings into descriptor set 1; the uniform buffer uses set 0. Fragment shaders are rebuilt with `glslc` and validated with `spirv-val`.
 - Adds upstream SDL's dummy video backend to a private copy of the SDK SDL archive. This leaves VideoOut owned by the native Vulkan driver. Desktop relative-mouse capture is disabled.
 - Uses the engine's single-thread timer mode. Game content is read from `/app0`; user data and diagnostics use `/data/serioussam`.
-- Audio is disabled for this milestone. Dynamically loaded Vorbis/MP3 libraries are not linked yet.
+- Native ScePad events feed the existing engine controls. Left-stick movement currently uses digital thresholds; right-stick aiming uses a deadzone and elapsed-time scaling. Disconnects release held keys. Menu/game context selects the appropriate button bindings.
+- SDL uses a private PS4 kernel semaphore adapter for thread startup; SDK POSIX semaphore stubs and the generic SDL condition-variable workaround were unsuitable. The SDK installation is unchanged.
+- Bundled Ogg/Vorbis and amp11lib decoders are linked statically and exposed through the module resolver. The engine mixes 44.1 kHz stereo and SDL resamples to the PS4 AudioOut device at 48 kHz.
 
 ### Build prerequisites
 
@@ -56,11 +58,11 @@ Outputs:
 - `artifacts/ps4/`: build logs, input/output SHA-256 records, emulator log, screenshot and `run.json`.
 - `build/emulator-profile/shadPS4/data/serioussam/`: engine and native graphics logs.
 
-The runtime stage uses symlinks to the local retail archives and loose `Levels` directory. It is for local emulator testing, not a portable package tree. No retail assets are committed.
+The runtime stage uses symlinks to the local retail archives and loose `Levels` directory. It is for local emulator testing, not a portable package tree. No retail assets are committed. `scripts/package-ps4.py` copies the local data into a self-contained, ignored PKG for personal console testing.
 
 ## Validation and remaining work
 
-Confirmed so far:
+Initial graphics checkpoint (`0b54cdf`):
 
 - OpenOrbis compilation and static link, executable conversion, and a complete scripted build from a fresh source/build directory (513 Ninja steps). The fresh build reproduced the same `eboot.bin` SHA-256: `ff1962896e1fbc2b2205e82502b5f62eb3e1b08923170ce139c113cf71750dc2`.
 - shadPS4 boot into the actual game engine, native PS4 Vulkan context creation, loading the retail intro level and adding its player.
@@ -68,12 +70,61 @@ Confirmed so far:
 
 The runner's successful timeout only demonstrates that the process remained alive until capture. It does not establish rendering correctness or playability. Screenshots and engine/native-driver logs must be checked together.
 
-Next gates:
+## Alpha 0.01 checkpoint
 
-1. Validate a playable level beyond the now-visible 3D intro, including depth, textures and timing.
-2. Implement and test DualShock navigation, movement and aiming; desktop mouse capture is currently disabled.
-3. Restore audio and statically link the required codecs.
-4. Produce a local installable PKG, then test on the physical PS4. No physical-console test has been performed.
-5. Carry the working platform changes to Second Encounter, which is not yet cross-built.
+The final 130-second shadPS4 run used `build/package-tfe-extracted/uroot/eboot.bin`, not the development staging tree. It survived until the runner stopped it and reached frame 5,354. Verified evidence:
 
-Resolved bring-up failures: SDL timer-thread startup crash (single-thread engine mode), competing SDL/native VideoOut handles (dummy SDL window), unsupported D24 depth format (D32/S8), and SDL relative-mouse warp assertion (disabled desktop capture).
+- Navigated the menus via emulated ScePad and started `Levels/01_Hatshepsut.wld` on Normal; the engine created a quicksave.
+- Closed NETRICSA and displayed the first-person pistol, crosshair and HUD. `game-before.png` shows the start platform; `game-moved.png` shows the player further up the ramp; `game-turned.png` shows a changed heading after right-stick input.
+- `PS4 ACTION` records forward movement changing from `0` to `-10` and back, and the fire bit changing from `0` to `1` and back. The test then opened the pause menu (`game-paused.png`). Enemy combat, complete levels and save reloads are not yet validated.
+- The isolated audio capture contains 5,867,287 nonzero 16-bit samples, peak 18,005, RMS approximately 1,302 over 134.144 seconds. This confirms actual host audio output from the emulated AudioOut path, without claiming subjective quality or console output.
+- PkgTool validation passed. Extraction checked 203 files; application SFO fields were preserved. No PRX/SPRX files are present.
+
+Artifacts are under ignored `artifacts/ps4/` and `artifacts/package/`. The exact tested executable SHA-256 is `1e3e34fc21bb7330e3f9f164e59b49ae0e65ebb6a879eae18b062fbd229a0c1b`; the local package SHA-256 is `eeae5814f6016eb539d2304e97869dab7e99b2431e19b41ee59dc67d8eb56c0c` (395,837,440 bytes). Repackaging may change the package hash because of metadata timestamps.
+
+Resolved this step: semaphore/thread-start synchronization, right-stick motion being overwritten by desktop mouse polling, and incorrect bracket scancodes for weapon cycling. The original SDK SDL library remains untouched.
+
+## Controls
+
+| DualShock input | Action |
+| --- | --- |
+| D-pad / left stick in menus | Navigate |
+| Cross in menus | Select |
+| Circle in menus / Options | Back / menu / resume |
+| Left stick in game | Move and strafe (digital threshold for now) |
+| Right stick in game | Aim |
+| Cross / Circle in game | Jump / crouch |
+| R2 / L2 | Fire / use or NETRICSA |
+| Square | Reload |
+| L1 / R1 | Previous / next weapon |
+| Triangle | Third-person view |
+
+These bindings use the supplied default control profile. Remapping engine keyboard bindings also changes the corresponding pad actions. Menus currently navigate one item per press, with no held-direction repeat.
+
+## Reproduce controller/audio tests
+
+```sh
+python3 scripts/record-ps4-audio.py --seconds 130 --actions scripts/tests/ps4-gameplay.json
+```
+
+The timed input script enters a Normal single-player game, skips introductory cameras with fire, moves, turns, fires and opens the pause menu. It sends XTest keyboard events to the isolated shadPS4 display, which shadPS4 translates to ScePad; it does not inject actions directly into the game. The host additionally needs X11/XTest libraries, PulseAudio-compatible `pactl`/`parec`, and an active audio server.
+
+The recorder creates a temporary private sink, routes only the launched emulator PID's audio streams into it, and removes the sink afterward. `audio.wav` and `audio.json` report the captured signal. Signal presence does not establish perceptual quality or physical PS4 output. Timed actions are evidence only when the corresponding screenshots and `PS4 INPUT` / `PS4 ACTION` logs confirm their effects.
+
+## Local console package
+
+```sh
+python3 scripts/package-ps4.py
+python3 scripts/verify-ps4-package.py
+python3 scripts/run-ps4.py --eboot build/package-tfe-extracted/uroot/eboot.bin --seconds 130 --actions scripts/tests/ps4-gameplay.json
+```
+
+- Output: `dist/SeriousSam-TFE-PS4-Alpha-0.01-local.pkg`, title ID `SSAM00001`.
+- The package includes the locally supplied retail data. Keep this artifact local; the public repository contains source, patches and scripts only.
+- No additional PRX/SPRX modules are bundled. The executable imports the system kernel, GNM, Pad, UserService, AudioOut, VideoOut and Net libraries.
+- Package structure/signature validation and extracted file/SFO verification are separate from launching the extracted executable and from physical PS4 testing.
+- Saves and logs use `/data/serioussam`. This alpha bundles its assets under `/app0`; no USB game-data path is implemented.
+
+First physical test: install the local PKG through the console's existing homebrew package installer, launch **Serious Sam TFE - PS4 Alpha 0.01**, press Options to leave the attract intro, then choose Single Player → New Game → Normal with Cross. R2 skips the opening cameras; Options closes NETRICSA. Check movement, aiming, firing, pause/resume and sound. Record any crash screen and retain `/data/serioussam/SeriousSam.log` and `vulkan.log` if accessible. This procedure has not yet been performed on hardware.
+
+Next gates: physical PS4 launch and controls/audio, longer gameplay with saves and level changes, performance and render-correctness review, and carrying the platform changes to Second Encounter. TSE is not yet cross-built. The native graphics stack still depends on the documented Doom3 checkout.
