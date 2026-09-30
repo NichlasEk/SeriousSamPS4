@@ -1,3 +1,6 @@
 [submodule "engine"]
 	path = engine
 	url = https://github.com/Croteam-official/Serious-Engine.git
+[submodule "engine-vk"]
+	path = engine-vk
+	url = https://github.com/tx00100xt/SeriousSamClassic-VK.git

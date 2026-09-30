@@ -3,6 +3,7 @@
 /build/
 /dist/
 /artifacts/
+/.tools/
 *.pkg
 *.iso
 *.log

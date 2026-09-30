@@ -1,6 +1,6 @@
 # Serious Sam PS4
 
-PS4 port workspace for the classic Serious Sam games. The upstream [Serious Engine 1.10](https://github.com/Croteam-official/Serious-Engine) source is pinned as a Git submodule in `engine/`.
+PS4 port workspace for the classic Serious Sam games. Croteam's original [Serious Engine 1.10](https://github.com/Croteam-official/Serious-Engine) source is pinned in `engine/`. The Linux/SDL2/[Vulkan fork](https://github.com/tx00100xt/SeriousSamClassic-VK) used for port work is pinned in `engine-vk/`. Both are Git submodules.
 
 Clone with `git clone --recurse-submodules https://github.com/NichlasEk/SeriousSamPS4.git`, or run `git submodule update --init` after a regular clone.
 
@@ -11,3 +11,5 @@ For MODE2/2352 BIN/CUE images named `Serious Sam - The First Encounter (USA)` an
 The original game archives are in `media/game/tfe/Install/*.gro` and `media/game/tse/Install/*.gro`. The port will stage the needed archives for each game separately. All disc images, converted ISOs, and extracted files stay local.
 
 The PS4 port has not been built or tested yet. The existing Doom 3 PS4 project is a reference for the OpenOrbis graphics and packaging work.
+
+See [port status](docs/PORT_STATUS.md) for the current data and desktop baseline.
