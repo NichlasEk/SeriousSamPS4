@@ -1,0 +1,8 @@
+# Locally supplied game data and generated PS4 artifacts.
+/media/
+/build/
+/dist/
+/artifacts/
+*.pkg
+*.iso
+*.log
