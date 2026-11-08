@@ -54,6 +54,19 @@ are preserved for rollback. Physical validation of these new builds is pending.
 
 See [port status](docs/PORT_STATUS.md) for dependencies, current evidence and remaining work.
 
+## shadPS4 screenshots
+
+Captured from the exact release executables with external game data. These are
+emulator captures, not photos of a physical PS4. No image retouching was applied.
+
+**First Encounter 0.04 — Hatshepsut**
+
+![First Encounter 0.04 in shadPS4](docs/screenshots/tfe-0.04-shadps4.png)
+
+**Second Encounter 0.02 — Palenque**
+
+![Second Encounter 0.02 in shadPS4](docs/screenshots/tse-0.02-shadps4.png)
+
 ## Cover icons
 
 Separate generated artwork is included for each encounter. Package-ready icons:

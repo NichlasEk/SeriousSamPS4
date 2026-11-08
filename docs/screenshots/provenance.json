@@ -1,0 +1,28 @@
+{
+  "tfe": {
+    "file": "tfe-0.04-shadps4.png",
+    "size": [
+      1280,
+      720
+    ],
+    "sha256": "417802e466f0b8883f2a80fff426b0b2df06d2fd66832cb360a88a19e10eead2",
+    "package_sha256": "62737b774cccae8e028cad9dc406b79f18402b0f62a14895c6f90afc433fa27b",
+    "eboot_sha256": "bf27d13fe84cd6289437070a33534d8e906183733827255abb4b0525539cfeac",
+    "environment": "shadPS4, not physical PS4",
+    "level": "01_Hatshepsut",
+    "edited": false
+  },
+  "tse": {
+    "file": "tse-0.02-shadps4.png",
+    "size": [
+      1280,
+      720
+    ],
+    "sha256": "2878fc83cc8329b6229512e1c473d7f4ec317778b5c5ce16c641f81641ddee5f",
+    "package_sha256": "7a0efe4b4a04ed9d7cbec574df8faa3043d749f5251563ca7ec57ffcc4595dfa",
+    "eboot_sha256": "3c08da8ec118459e889ea32a78ff7be1e58380417376815bbb572b43706a428e",
+    "environment": "shadPS4, not physical PS4",
+    "level": "1_1_Palenque",
+    "edited": false
+  }
+}

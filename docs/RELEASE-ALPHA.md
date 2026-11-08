@@ -20,3 +20,16 @@ Source/build/relink material and SHA-256 checksums are attached. See
 upstream license of the linked libjbc USB helper.
 
 Please report the game/version, firmware, storage type and symptoms in Issues.
+
+### Screenshots — shadPS4 emulator
+
+These captures show the exact release executables loading the first campaign
+levels with external game data. They are not physical PS4 screenshots.
+
+**The First Encounter — Hatshepsut**
+
+![TFE 0.04 in shadPS4](https://raw.githubusercontent.com/NichlasEk/SeriousSamPS4/main/docs/screenshots/tfe-0.04-shadps4.png)
+
+**The Second Encounter — Palenque**
+
+![TSE 0.02 in shadPS4](https://raw.githubusercontent.com/NichlasEk/SeriousSamPS4/main/docs/screenshots/tse-0.02-shadps4.png)
