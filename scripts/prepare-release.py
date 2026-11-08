@@ -108,6 +108,8 @@ has not been verified. This is not a claim that every dependency shares GPLv2.
         z.write(ROOT/'engine-vk/README.md','README-upstream.md')
     for src,dest in [('INSTALL-ALPHA.md','INSTALL.md'),('THIRD-PARTY.md','THIRD-PARTY.md'),('RELEASE-ALPHA.md','RELEASE-NOTES.md')]:
         shutil.copyfile(ROOT/'docs'/src,RELEASE/dest)
+    for name in ['tfe-0.04-shadps4.png','tse-0.02-shadps4.png']:
+        shutil.copyfile(ROOT/'docs/screenshots'/name, RELEASE/name)
     (RELEASE/'SHA256SUMS').write_text(''.join(f'{sha(p)}  {p.name}\n' for p in sorted(RELEASE.iterdir()) if p.is_file() and p.name!='SHA256SUMS'))
     print(json.dumps({'kit':str(kit),'release':str(RELEASE),'source_files':len(inventory)},indent=2))
 if __name__=='__main__': main()
