@@ -23,19 +23,18 @@ level = args.level.replace('\\', '/')
 if not level.startswith('Levels/') or not level.endswith('.wld') or any(c in level for c in '\";\n\r') or '..' in level:
     parser.error('Expected a safe Levels/...wld path')
 case = Path(level).stem
-base = root/f'build/level-tests/{args.game}/{case}'
+base = root/f'build/level-tests-external/{args.game}/{case}'
 stage = base/'runtime'
 if base.exists():
     parser.error(f'Previous evidence exists: {base}; use a new case or archive it first')
 stage.mkdir(parents=True)
-source = root/f'build/package-{args.game}-extracted/uroot'
+source = root/f'dist/external-data/{"serioussam-game" if args.game == "tfe" else "serioussamse-game"}'
 for item in source.iterdir():
     if item.name == 'Scripts':
         shutil.copytree(item, stage/item.name)
-    elif item.name == 'eboot.bin':
-        shutil.copy2(item, stage/item.name)
     else:
         (stage/item.name).symlink_to(item, target_is_directory=item.is_dir())
+eboot = root/f'build/package-{args.game}-external-extracted/uroot/eboot.bin'
 # The shell parser understands doubled backslashes in string literals.
 script_level = level.replace('/', '\\\\')
 with (stage/'Scripts/Game_startup.ini').open('a') as f:
@@ -46,9 +45,9 @@ for at, key in [(25,'n'),(29,'n'),(33,'n'),(37,'n'),(65,'o'),(70,'o'),(78,'Retur
 actions.append(dict(at=args.seconds-2,type='capture',name='level.png'))
 action_file=base/'actions.json'
 action_file.write_text(json.dumps(actions,indent=2)+'\n')
-out=root/f'artifacts/levels/{args.game}/{case}'
+out=root/f'artifacts/levels-external/{args.game}/{case}'
 subprocess.run([sys.executable,str(root/'scripts/run-ps4.py'),'--game',args.game,
-    '--eboot',str(stage/'eboot.bin'),'--profile',str(base/'profile'),
+    '--eboot',str(eboot),'--data-dir',str(stage),'--profile',str(base/'profile'),
     '--output',str(out),'--seconds',str(args.seconds),'--actions',str(action_file)],check=True)
 userdir='serioussam' if args.game=='tfe' else 'serioussamse'
 log=base/f'profile/shadPS4/data/{userdir}/SeriousSam.log'

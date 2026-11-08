@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Package the built alpha with the user's local data for console testing."""
+"""Package the external-data alpha and prepare its separate local data folder."""
 from pathlib import Path, PurePosixPath
 import argparse
 import hashlib
@@ -18,16 +18,18 @@ label = game.upper()
 sdk = Path(os.environ.get('OO_PS4_TOOLCHAIN', '/opt/openorbis/OpenOrbis/PS4Toolchain'))
 stack = Path(os.environ.get('SS_NATIVE_STACK', '/home/nichlas/Doom3-Ps4/build/native'))
 runtime = root/f'build/runtime-{game}'
-stage = root/f'build/package-{game}'
+stage = root/f'build/package-{game}-external'
 dist = root/'dist'
-out = root/('artifacts/package' if game == 'tfe' else 'artifacts/package-tse')
+out = root/f'artifacts/package-{game}-external'
 for directory in [stage/'sce_sys', dist, out]:
     directory.mkdir(parents=True, exist_ok=True)
 tool = sdk/'bin/linux/PkgTool.Core'
+# Isolate the SDK's self-extracting .NET runtime from stale shared /tmp caches.
+os.environ.setdefault('DOTNET_BUNDLE_EXTRACT_BASE_DIR', str(root/'build/pkgtool-dotnet'))
 title_id = 'SSAM00001' if game == 'tfe' else 'SSAM00002'
 content_id = f'IV0000-{title_id}_00-SERIOUSSAM{label}001'
-version = '00.03' if game == 'tfe' else '00.01'
-release = '0.03' if game == 'tfe' else '0.01'
+version = '00.04' if game == 'tfe' else '00.02'
+release = '0.04' if game == 'tfe' else '0.02'
 assert re.fullmatch(r'[A-Z]{2}[0-9]{4}-'+title_id+r'_[0-9]{2}-[A-Z0-9]{16}', content_id)
 elf = root/f'build/ps4-{game}/SeriousSam'
 imports = set(re.findall(r'\(NEEDED\).*?\[(.*?)\]', subprocess.check_output(['readelf', '-d', str(elf)], text=True)))
@@ -44,17 +46,8 @@ def copy(source, name):
     target.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(['cp', '--reflink=auto', '--', str(source), str(target)], check=True)
     files.add(name)
-retail_files = (['1_00.gro', '1_00_music.gro', 'Levels'] if game == 'tfe' else
-                ['SE1_00.gro', 'SE1_00_Extra.gro', 'SE1_00_Levels.gro', 'SE1_00_Music.gro'])
-for name in ['eboot.bin', 'Controls', 'Data', 'Demos', 'Help', 'Players', 'Scripts',
-             'SE1_10b.gro', 'ModEXT.txt'] + retail_files:
-    source = (runtime/name).resolve(strict=True)
-    if source.is_dir():
-        for entry in sorted(source.rglob('*')):
-            if entry.is_file():
-                copy(entry, str(PurePosixPath(name)/entry.relative_to(source).as_posix()))
-    else:
-        copy(source, name)
+copy(runtime/'eboot.bin', 'eboot.bin')
+subprocess.run(['python3', str(root/'scripts/stage-external-data.py'), '--game', game], check=True)
 # Required loader stubs and shell attribution from the open SDK, matching the
 # layout used by the physically tested Doom 3 package. Static linking alone
 # does not remove the console's package requirements.
@@ -71,7 +64,9 @@ for source, name in [(root/'engine-vk/LICENSE', 'SeriousEngine-LICENSE'),
                      (root/'engine-vk/SamTFE/Sources/External/libogg/COPYING', 'Ogg-LICENSE')]:
     copy(source, 'notices/'+name)
 info = {'candidate': f'Serious Sam {label} PS4 Alpha {release}', 'eboot_sha256': digest(runtime/'eboot.bin'),
-        'game': game, 'engine_elf_sha256': digest(elf), 'contains_owned_retail_data': True,
+        'game': game, 'engine_elf_sha256': digest(elf), 'contains_owned_retail_data': False,
+        'external_data_folder': 'serioussam-game' if game == 'tfe' else 'serioussamse-game',
+        'search_order': ['HDD /data', 'USB slots 0-7'],
         'physical_ps4_tested': False,
         'extra_runtime_modules': {name:digest(stage/name) for name in support_modules}}
 (out/'build-info.json').write_text(json.dumps(info, indent=2)+'\n')
@@ -116,7 +111,7 @@ tree.write(project, encoding='utf-8', xml_declaration=True)
 with (out/'build.log').open('w') as log:
     subprocess.run([str(tool), 'pkg_build', 'pkg.gp4', '.'], cwd=stage,
                    stdout=log, stderr=subprocess.STDOUT, check=True)
-package = dist/f'SeriousSam-{label}-PS4-Alpha-{release}-local.pkg'
+package = dist/f'SeriousSam-{label}-PS4-Alpha-{release}-external.pkg'
 partial = package.with_suffix('.pkg.partial')
 subprocess.run(['cp', '--reflink=auto', '--', str(stage/(content_id+'.pkg')), str(partial)], check=True)
 with (out/'validate.log').open('w') as log:

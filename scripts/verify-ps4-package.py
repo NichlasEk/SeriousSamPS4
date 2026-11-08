@@ -14,13 +14,15 @@ parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--game', choices=['tfe', 'tse'], default='tfe')
 parser.add_argument('--existing-extraction',action='store_true')
 args=parser.parse_args()
-out=root/('artifacts/package' if args.game == 'tfe' else 'artifacts/package-tse')
+out=root/f'artifacts/package-{args.game}-external'
 manifest=json.loads((out/'manifest.json').read_text())
 package=Path(manifest['package'])
-stage=root/f'build/package-{args.game}'
-output=root/f'build/package-{args.game}-extracted'
+stage=root/f'build/package-{args.game}-external'
+output=root/f'build/package-{args.game}-external-extracted'
 app=output/'uroot'
 tool=Path(os.environ.get('OO_PS4_TOOLCHAIN','/opt/openorbis/OpenOrbis/PS4Toolchain'))/'bin/linux/PkgTool.Core'
+# Isolate the SDK's self-extracting .NET runtime from stale shared /tmp caches.
+os.environ.setdefault('DOTNET_BUNDLE_EXTRACT_BASE_DIR', str(root/'build/pkgtool-dotnet'))
 def sha(path):
     with path.open('rb') as f: return hashlib.file_digest(f,'sha256').hexdigest()
 if sha(package)!=manifest['sha256']:
@@ -61,6 +63,8 @@ support_modules = {
     'sce_module/libSceFios2.prx': '3f8236c5996cf8e9917b8d27706d9743f6603d89de3b9859eacbb9f466b19c01',
     'sce_sys/about/right.sprx': 'e3416f9c6152276b494982baf7b65ebcd8052274ffc42f95a776318022842b64',
 }
+if list(app.rglob('*.gro')) or (app/'Levels').exists():
+    raise SystemExit('External package unexpectedly contains retail game data')
 actual_modules = {path.relative_to(app).as_posix()
                   for pattern in ('*.prx', '*.sprx') for path in app.rglob(pattern)}
 if actual_modules != set(support_modules):

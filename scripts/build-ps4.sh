@@ -18,9 +18,9 @@ mkdir -p "$root/build" "$root/artifacts/$logdir" "$root/build/runtime-$game"
   echo 'Build the Doom3 native stack first, or set SS_NATIVE_STACK to an equivalent source-built stack.' >&2; exit 1;
 }
 [[ -x "$converter" ]] || { echo 'Set CREATE_FSELF to the OpenOrbis converter.' >&2; exit 1; }
-sha256sum "$root/patches/$patch_name" \
+sha256sum "$root/patches/$patch_name" "$root/patches/003-external-data-$game.patch" \
   "$root/platform/ps4/"*.cpp "$root/platform/ps4/"*.c \
-  "$root/cmake/"*.cmake "$root/scripts/build-ps4-sdl.py" \
+  "$root/cmake/"*.cmake "$root/scripts/build-ps4-sdl.py" "$root/scripts/build-ps4-usb.py" \
   "$stack/vulkan-ps4/libvulkan_ps4.a" "$stack/opengnm/libopengnm.a" \
   "$stack/libpsbc-private.a" "$OO_PS4_TOOLCHAIN/lib/libSDL2.a" "$converter" \
   > "$root/artifacts/$logdir/build-inputs.sha256"
@@ -29,11 +29,24 @@ for checkout in "$source" "$host_source"; do
   [[ $(git -C "$checkout" rev-parse HEAD) == "$revision" ]] || { echo "Unexpected source revision: $checkout" >&2; exit 1; }
 done
 patch="$root/patches/$patch_name"
-if ! git -C "$source" apply --reverse --check "$patch" 2>/dev/null; then
+external_patch="$root/patches/003-external-data-$game.patch"
+# Already applied supplemental changes also contain the base patch.
+if git -C "$source" apply --reverse --check "$external_patch" 2>/dev/null; then
+  base_ready=1
+else
+  base_ready=0
+fi
+if [[ "$base_ready" == 0 ]] && ! git -C "$source" apply --reverse --check "$patch" 2>/dev/null; then
   git -C "$source" diff --quiet -- "$tree" || { echo 'Preserve and review existing PS4 source edits before applying the patch.' >&2; exit 1; }
   git -C "$source" apply --check "$patch"
   git -C "$source" apply "$patch"
 fi
+if [[ "$base_ready" == 0 ]]; then
+  git -C "$source" apply --check "$external_patch"
+  git -C "$source" apply "$external_patch"
+fi
+python3 "$root/scripts/build-ps4-usb.py"
+sha256sum "$root/build/ps4-usb/libss-jbc.a" >> "$root/artifacts/$logdir/build-inputs.sha256"
 cmake -S "$host_source/$tree/Sources" -B "$root/build/$hostdir" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DUSE_ASM=OFF -DUSE_SYSTEM_VULKAN=OFF \
   > "$root/artifacts/$logdir/host-configure.log" 2>&1

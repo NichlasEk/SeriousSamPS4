@@ -1,5 +1,10 @@
 # Serious Sam PS4 port status
 
+2026-11-08: external-data TFE 0.04 / TSE 0.02 candidates now use HDD-first,
+USB-fallback discovery. See [installation and checks](EXTERNAL-DATA.md).
+The older results below describe previous builds; physical acceptance of the
+external-data candidates remains pending.
+
 Updated 2026-09-30. First Encounter 0.02 is confirmed running on physical PS4 with smooth gameplay and slower cinematics. First Encounter 0.03 adds controller functions; Second Encounter 0.01 now builds and runs in shadPS4. Hardware validation of the new builds is pending.
 
 ## Source and game data

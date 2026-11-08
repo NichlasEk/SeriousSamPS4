@@ -1,5 +1,10 @@
 # Serious Sam PS4
 
+**Experimental alpha:** [TFE 0.04 + TSE 0.02 release](https://github.com/NichlasEk/SeriousSamPS4/releases/tag/alpha-tfe-0.04-tse-0.02).
+Download the PKG(s) and support-data ZIP, then follow [installation](docs/INSTALL-ALPHA.md).
+Original game files are required. These exact builds are emulator-tested; physical PS4
+and USB validation remain pending. See [third-party credits](docs/THIRD-PARTY.md).
+
 PS4 port workspace for the classic Serious Sam games. Croteam's original [Serious Engine 1.10](https://github.com/Croteam-official/Serious-Engine) source is pinned in `engine/`. The Linux/SDL2/[Vulkan fork](https://github.com/tx00100xt/SeriousSamClassic-VK) used for port work is pinned in `engine-vk/`. Both are Git submodules.
 
 Clone with `git clone --recurse-submodules https://github.com/NichlasEk/SeriousSamPS4.git`, or run `git submodule update --init` after a regular clone.
@@ -25,23 +30,27 @@ python3 scripts/run-ps4.py --game tse --seconds 180
 
 The builds produce `build/runtime-tfe/eboot.bin` and `build/runtime-tse/eboot.bin`. The runner uses separate shadPS4 profiles and atomically allocated Xvfb displays, captures `artifacts/ps4/emulator.png` or `artifacts/ps4-tse/emulator.png`, records logs and stops after the requested duration.
 
-To create and check a local installable package containing your supplied game data:
+To build a small package with separate game data, see
+[external data installation and validation](docs/EXTERNAL-DATA.md).
 
 ```sh
+bash scripts/build-ps4.sh tfe
 python3 scripts/package-ps4.py --game tfe
 python3 scripts/verify-ps4-package.py --game tfe
+bash scripts/build-ps4.sh tse
 python3 scripts/package-ps4.py --game tse
 python3 scripts/verify-ps4-package.py --game tse
 ```
 
-Local outputs (both contain retail assets and remain ignored by Git):
+| Game | Package in `dist/` | Separate data folder in `dist/external-data/` |
+| --- | --- | --- |
+| First Encounter | `SeriousSam-TFE-PS4-Alpha-0.04-external.pkg` | `serioussam-game/` |
+| Second Encounter | `SeriousSam-TSE-PS4-Alpha-0.02-external.pkg` | `serioussamse-game/` |
 
-| Game | Package | Title ID | Saves/logs |
-| --- | --- | --- | --- |
-| First Encounter | `dist/SeriousSam-TFE-PS4-Alpha-0.03-local.pkg` | `SSAM00001` | `/data/serioussam` |
-| Second Encounter | `dist/SeriousSam-TSE-PS4-Alpha-0.01-local.pkg` | `SSAM00002` | `/data/serioussamse` |
-
-Both include the full supplied campaign data, not just the opening level. The two titles can coexist. This is still an alpha: including every campaign file does not establish a complete playthrough.
+Copy the whole data folder to PS4 `/data/` or the USB root. HDD takes priority,
+then USB slots 0–7. Saves/logs remain at `/data/serioussam` and
+`/data/serioussamse`. Both titles can coexist. Previous bundled local packages
+are preserved for rollback. Physical validation of these new builds is pending.
 
 See [port status](docs/PORT_STATUS.md) for dependencies, current evidence and remaining work.
 

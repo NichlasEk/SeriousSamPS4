@@ -18,6 +18,7 @@ parser.add_argument('--seconds', type=int, default=25)
 parser.add_argument('--display-ready', action='store_true')
 parser.add_argument('--actions', type=Path, help='JSON list of timed X11 key transitions and captures')
 parser.add_argument('--eboot', type=Path)
+parser.add_argument('--data-dir', type=Path, help='External game resources; default: build/runtime-GAME')
 parser.add_argument('--profile', type=Path, help='Separate emulator data/profile directory')
 parser.add_argument('--output', type=Path, help='Separate evidence directory')
 args = parser.parse_args()
@@ -42,6 +43,7 @@ if not args.display_ready:
         command = [sys.executable, __file__, '--game', args.game, '--display-ready',
                    '--seconds', str(args.seconds), '--eboot', str(args.eboot.resolve()),
                    *(['--profile', str(args.profile.resolve())] if args.profile else []),
+                   *(['--data-dir', str(args.data_dir.resolve())] if args.data_dir else []),
                    *(['--output', str(args.output.resolve())] if args.output else []),
                    *(['--actions', str(args.actions.resolve())] if args.actions else [])]
         raise SystemExit(subprocess.call(command, env=dict(os.environ, DISPLAY=':'+display)))
@@ -74,6 +76,14 @@ timed_stop = False
 captured = False
 profile = args.profile or root/('build/emulator-profile' if args.game == 'tfe' else 'build/emulator-profile-tse')
 (profile/'shadPS4/data').mkdir(parents=True, exist_ok=True)
+folder = 'serioussam-game' if args.game == 'tfe' else 'serioussamse-game'
+external = profile/'shadPS4/data'/folder
+data_source = (args.data_dir or root/f'build/runtime-{args.game}').resolve(strict=True)
+if external.exists() or external.is_symlink():
+    if args.data_dir and external.resolve() != data_source:
+        raise SystemExit('Existing profile data differs from --data-dir; use a fresh profile')
+else:
+    external.symlink_to(data_source, target_is_directory=True)
 # Current shadPS4 asks about legacy save migration when creating user 1000,
 # even for an empty profile. Prepare only our isolated users' empty directories.
 for user in range(1000, 1004):

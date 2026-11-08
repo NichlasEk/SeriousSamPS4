@@ -1,4 +1,4 @@
-include_directories("${SS_PS4_ROOT}/platform/ps4/include")
+include_directories("${SS_PS4_ROOT}/platform/ps4/include" "${SS_PS4_ROOT}/build/ps4-usb")
 # PS4 links the engine modules into one executable.
 set_property(TARGET ${ENGINELIB} PROPERTY LINK_LIBRARIES engine_safemath${MP})
 set_property(TARGET SeriousSam${MP} PROPERTY LINK_FLAGS "")
@@ -18,6 +18,7 @@ add_custom_command(OUTPUT "${CMAKE_BINARY_DIR}/static_exports.cpp"
   DEPENDS ${GAMEMPLIB} ${ENTITIESMPLIB} ${SHADERSLIB} amp11lib${MP} ps4_vorbis "${SS_PS4_ROOT}/scripts/generate-static-exports.py")
 target_sources(SeriousSam${MP} PRIVATE "${CMAKE_BINARY_DIR}/static_exports.cpp"
   "${SS_PS4_ROOT}/platform/ps4/input.cpp"
+  "${SS_PS4_ROOT}/platform/ps4/storage.cpp"
   "${SS_PS4_ROOT}/platform/ps4/videoout_wsi.cpp")
 if(INTERNAL_NAME STREQUAL "serioussamse")
   target_compile_definitions(SeriousSam${MP} PRIVATE SS_PS4_TSE)
@@ -28,4 +29,5 @@ set_property(TARGET SeriousSam${MP} PROPERTY LINK_LIBRARIES
   "${SS_NATIVE_STACK}/vulkan-ps4/libvulkan_ps4.a"
   "${SS_NATIVE_STACK}/opengnm/libopengnm.a"
   "${SS_NATIVE_STACK}/libpsbc-private.a"
+  "${SS_PS4_ROOT}/build/ps4-usb/libss-jbc.a"
   "-Wl,--end-group" SceGnmDriver)
